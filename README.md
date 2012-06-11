@@ -28,22 +28,106 @@ This registration should be done only once per application to avoid hitting your
 
 Once you have your Client ID/Tag and User ID/Tag, you can start making queries.
 
-To search for David Bowie's 'Moss Garden' from his '"Heroes"' album, do:
+To search for the Kings of Convenience track "Homesick" from their album "Riot On An Empty Street", do:
 
-	metadata = pygn.lookupTrack(clientID, clientTag, userID, userTag, 'David Bowie', 'Heroes', 'Moss Garden')
+	metadata = pygn.lookupTrack(clientID, clientTag, userID, userTag, 'Kings Of Convenience', 'Riot On An Empty Street', 'Homesick')
 
-The returned gnmetadata object is a Python dict containing multiple metadata fields, see pygn.py for the full list.
+The returned gnmetadata object is a Python dict containing multiple metadata fields.
+	
+	{
+	    "album_art_url": "https://web.content.cddbp.net/cgi-bin/content-thin?id=8D43DA988315CC43&client=3675392&class=cover&origin=front&size=medium&type=image/jpeg&tag=02EtNKHYoxbmX81TvhkE3fi9TqbeRGUtLtq0..8BHgwpPbeO8Qr83xuw", 
+	    "album_artist_name": "Kings Of Convenience", 
+	    "album_gnid": "59247312-2ED193587EF0504C7A0C416ED66DA962", 
+	    "album_title": "Riot On An Empty Street", 
+	    "album_year": "2004", 
+	    "artist_bio_url": "https://web.content.cddbp.net/cgi-bin/content-thin?id=22DA84B96832BF4F&client=3675392&class=biography&type=text/plain&tag=02UUefhCnS5BJ-esbokzJX7W22Yod1K16ehzV.cY7h1ReCwW.77g89DQ", 
+	    "artist_era": {
+	        "1": {
+	            "ID": "29483", 
+	            "TEXT": "2000's"
+	        }
+	    }, 
+	    "artist_image_url": "https://web.content.cddbp.net/cgi-bin/content-thin?id=797304D567E8970F&client=3675392&class=image&size=medium&type=image/jpeg&tag=02pI.mKJmjXrmvZQ6Q18X8klZChtwp7oGtZDaoINl3OcH7owTe-soMkw", 
+	    "artist_origin": {
+	        "1": {
+	            "ID": "29896", 
+	            "TEXT": "Scandinavia"
+	        }, 
+	        "2": {
+	            "ID": "29990", 
+	            "TEXT": "Norway"
+	        }
+	    }, 
+	    "artist_type": {
+	        "1": {
+	            "ID": "29422", 
+	            "TEXT": "Male"
+	        }, 
+	        "2": {
+	            "ID": "29432", 
+	            "TEXT": "Male Duo"
+	        }
+	    }, 
+	    "genre": {
+	        "1": {
+	            "ID": "25312", 
+	            "TEXT": "Alternative & Punk"
+	        }, 
+	        "2": {
+	            "ID": "35477", 
+	            "TEXT": "Indie Rock"
+	        }, 
+	        "3": {
+	            "ID": "25460", 
+	            "TEXT": "Indie Pop"
+	        }
+	    }, 
+	    "lyrics": "I lose some sales and my boss won't be happy\nBut I can't stop listening to the sound\nOf two soft voices blended in perfection\nFrom the reels of this record that I found\n\nEvery day there's a boy in the mirror\nAsking me, \"What are you doing here?\"\nFinding more that previous motifs\nGrowing increasingly unclear\n\nI've traveled far and I burned all the bridges\nI believed as soon as I hit land\nAll the other options held before me\nWither in the light of my plan\n\nSo I lose some sales and my boss won't be happy\nBut there's only one thing on my mind\nSearching boxes underneath the counter\nOn a chance that on a tape I'd find\n\nA song for\nSomeone who needs somewhere\nTo long for\n\nHomesick\n'Cause I no longer know\nWhere home is\n\n", 
+	    "mood": {
+	        "1": {
+	            "ID": "42949", 
+	            "TEXT": "Melancholy"
+	        }, 
+	        "2": {
+	            "ID": "65343", 
+	            "TEXT": "Light Melancholy"
+	        }
+	    }, 
+	    "review_url": "https://web.content.cddbp.net/cgi-bin/content-thin?id=4045DA976DB1DEFA&client=3675392&class=review&type=text/plain&tag=02z.AZyq.HafSMqFFd.hLuKZpc.Vz8gOn-1fx8bdQM5Rih9jAIIEO9Mg", 
+	    "tempo": {
+	        "1": {
+	            "ID": "34283", 
+	            "TEXT": "Medium Tempo"
+	        }, 
+	        "2": {
+	            "ID": "34289", 
+	            "TEXT": "Medium Slow"
+	        }, 
+	        "3": {
+	            "ID": "34311", 
+	            "TEXT": "60s"
+	        }
+	    }, 
+	    "track_artist_name": "", 
+	    "track_gnid": "59247313-E198021B46C38679362C35619E93396B", 
+	    "track_number": "1", 
+	    "track_title": "Homesick"
+	}
+	
+Note that URLs to related content (e.g. Album Art, Artist Image, etc) are not valid forever, so your application should download the content you want relatively soon after the lookup and cache it locally.
 
 If you don't know which album a track is on (or don't care which album version you get), you can simply leave that parameter blank:
 
-	metadata = pygn.lookupTrack(clientID, clientTag, userID, userTag, 'David Bowie', '', 'Moss Garden')
+	metadata = pygn.lookupTrack(clientID, clientTag, userID, userTag, 'Kings Of Convenience', '', 'Homesick')
 
 pygn also provides convenience functions to look up just an Artist or just an Album. Doing:
 
 	metadata = pygn.lookupArtist(clientID, clientTag, userID, userTag, 'CSS')
 
-will return the same gnmetadata object with metadata for the top album by the specified Artist (with track-specific fields being blank) Calling:
+will return the same gnmetadata object with metadata for the top album by CSS (which happens to be 'Cansei De Ser Sexy' at time of writing), with track-specific fields being blank
 
-	metadata = pygn.lookupAlbum(clientID, clientTag, userID, userTag, 'Gotye', 'Boardface')
+Calling:
 
-will return a gnmetadata object with metadata for Gotye's "Boardface" album (with track-specific fields empty again)
+	metadata = pygn.lookupAlbum(clientID, clientTag, userID, userTag, 'Jaga Jazzist', 'What We Must')
+
+will return a gnmetadata object with metadata for Jaga Jazzist's "What We Must" album, again with track-specific fields empty
