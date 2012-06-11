@@ -1,9 +1,11 @@
 """
 pygn.py
 
-pygn (pronounced "pigeon") is a simple Python client for the Gracenote Music Web API, which can retrieve Artist, Album and Track metadata with the most common options.
+pygn (pronounced "pigeon") is a simple Python client for the Gracenote Music Web API, 
+which can retrieve Artist, Album and Track metadata with the most common options.
 
-You will need a Gracenote Client ID and Client Tag to use this module. Please contact developers@gracenote.com to get one.
+You will need a Gracenote Client ID and Client Tag to use this module. 
+Please contact developers@gracenote.com to get one.
 """
 
 import xml.etree.ElementTree, urllib2, urllib, json
@@ -37,6 +39,7 @@ class gnmetadata(dict):
 		self['artist_image_url'] = ''
 		self['artist_bio_url'] = ''
 		self['review_url'] = ''
+		self['lyrics'] = ''
 
 		# Gracenote IDs
 		self['album_gnid'] = ''
@@ -161,6 +164,9 @@ def lookupTrack(clientID, clientTag, userID, userTag, artistName, albumTitle, tr
 				metadata['artist_era'] = _getMultiElemText(trackElem, 'ARTIST_ERA', 'ORD', 'ID')
 			if trackElem.find('ARTIST_TYPE') is not None:
 				metadata['artist_type'] = _getMultiElemText(trackElem, 'ARTIST_TYPE', 'ORD', 'ID')
+				
+		# Get Lyrics
+		metadata['lyrics'] = _getLyrics(clientID, clientTag, userID, userTag, artistName, trackTitle)
 		
 		return metadata
 
@@ -198,13 +204,19 @@ def _getOET(clientID, clientTag, userID, userTag, GNID):
 	
 	queryXML = query.toString()
 	
+	if DEBUG:
+		print '------------'
+		print 'QUERY XML (from _getOET())'
+		print '------------'
+		print queryXML
+	
 	# POST query
 	response = urllib2.urlopen(_gnurl(clientID), queryXML)
 	albumXML = response.read()
 	
 	if DEBUG:
 		print '------------'
-		print 'RESPONSE XML (Secondary lookup)'
+		print 'RESPONSE XML (from _getOET())'
 		print '------------'
 		print albumXML
 	
@@ -217,7 +229,92 @@ def _getOET(clientID, clientTag, userID, userTag, GNID):
 		artistEra = _getMultiElemText(albumElem, 'ARTIST_ERA', 'ORD', 'ID')
 		artistType = _getMultiElemText(albumElem, 'ARTIST_TYPE', 'ORD', 'ID')
 	return artistOrigin, artistEra, artistType
-
+	
+def _getLyrics(clientID, clientTag, userID, userTag, artistName, trackTitle):
+	"""
+	Helper function to retrieve lyrics for specified track. First, it performs a Lyric Search by
+	Artist Name and Track Title, gets a GN ID (if found), then fetches the lyrics by GN ID.
+	"""
+	# Create XML request
+	query = _gnquery()
+	
+	query.addAuth(clientID, clientTag, userID, userTag)
+	query.addQuery('LYRIC_SEARCH')
+	query.addQueryTextField('ARTIST', artistName)
+	query.addQueryTextField('TRACK_TITLE', trackTitle)
+	queryXML = query.toString()
+	
+	if DEBUG:
+		print '------------'
+		print 'QUERY XML (from _getLyrics())'
+		print '------------'
+		print queryXML
+	
+	# POST query
+	response = urllib2.urlopen(_gnurl(clientID), queryXML)
+	responseXML = response.read()
+	
+	if DEBUG:
+		print '------------'
+		print 'RESPONSE XML (from _getLyrics())'
+		print '------------'
+		print responseXML
+	
+	# Parse XML
+	responseTree = xml.etree.ElementTree.fromstring(responseXML)
+	responseElem = responseTree.find('RESPONSE')
+	if responseElem.attrib['STATUS'] != 'OK':
+		return
+	
+	lyricElem = responseElem.find('LYRIC') # Just take the first one
+	lyricGNID = _getElemText(lyricElem, 'GN_ID')
+		
+	print 'lyricGNID: ' + lyricGNID
+	# Now that we have the GNID, create a new query and do a LYRIC_FETCH
+	query = _gnquery()
+	
+	query.addAuth(clientID, clientTag, userID, userTag)
+	query.addQuery('LYRIC_FETCH')
+	query.addQueryGNID(lyricGNID)
+	queryXML = query.toString()
+	
+	if DEBUG:
+		print '------------'
+		print 'QUERY XML (from _getLyrics() 2)'
+		print '------------'
+		print queryXML
+	
+	# POST query
+	response = urllib2.urlopen(_gnurl(clientID), queryXML)
+	responseXML = response.read()
+	
+	if DEBUG:
+		print '------------'
+		print 'RESPONSE XML (from _getLyrics() 2)'
+		print '------------'
+		print responseXML
+	
+	# Parse XML
+	responseTree = xml.etree.ElementTree.fromstring(responseXML)
+	responseElem = responseTree.find('RESPONSE')
+	if responseElem.attrib['STATUS'] != 'OK':
+		return
+	
+	lyricElem = responseElem.find('LYRIC')
+	lyricArtistName = _getElemText(lyricElem, 'ARTIST')
+	lyricTrackTitle = _getElemText(lyricElem, 'TITLE')
+	
+	lyrics = ''
+	
+	allBlockElems = lyricElem.findall('BLOCK')
+	for blockElem in allBlockElems:
+		allLineElems = blockElem.findall('LINE')
+		for lineElem in allLineElems:
+			lyrics += urllib.unquote(lineElem.text) + '\n'
+		lyrics += '\n'
+	
+	return lyrics
+	
 class _gnquery:
 	"""
 	A utility class for creating and configuring an XML query for POST'ing to
