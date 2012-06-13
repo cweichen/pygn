@@ -14,23 +14,22 @@ Since pygn is (so far) contained in a single Python file, no installer is provid
 
 ##Getting Started
 
-You will need a Gracenote Client ID/Tag pair to use this module. Please contact developers@gracenote.com to get these.
+You will need a Gracenote Client ID to use this module. Please contact developers@gracenote.com to get these.
 
-Each installed application also needs to have a User ID/Tag, which may be obtained by registering your Client ID/Tag with the Gracenote API. To do this, do:
+Each installed application also needs to have a User ID, which may be obtained by registering your Client ID with the Gracenote API. To do this, do:
 
 	import pygn
 
-	clientID = '*******' # Enter your Client ID here
-	clientTag = '***************' # Enter your Client Tag here
-	userID, userTag = pygn.getUserID(clientID, clientTag)
+	clientID = '*******-************************' # Enter your Client ID here
+	userID = pygn.register(clientID)
 
-This registration should be done only once per application to avoid hitting your API quota (i.e. definitely do NOT do this before every query). The userID and userTag can be stored in persistent storage (e.g. on the filesystem) and used for all subsequent pygn function calls.
+This registration should be done only once per application to avoid hitting your API quota (i.e. definitely do NOT do this before every query). The userID can be stored in persistent storage (e.g. on the filesystem) and used for all subsequent pygn function calls.
 
-Once you have your Client ID/Tag and User ID/Tag, you can start making queries.
+Once you have your Client ID and User ID, you can start making queries.
 
 To search for the Kings of Convenience track "Homesick" from their album "Riot On An Empty Street", do:
 
-	metadata = pygn.lookupTrack(clientID, clientTag, userID, userTag, 'Kings Of Convenience', 'Riot On An Empty Street', 'Homesick')
+	metadata = pygn.lookupTrack(clientID, userID, 'Kings Of Convenience', 'Riot On An Empty Street', 'Homesick')
 
 The returned gnmetadata object is a Python dict containing multiple metadata fields.
 	
@@ -82,7 +81,7 @@ The returned gnmetadata object is a Python dict containing multiple metadata fie
 	            "TEXT": "Indie Pop"
 	        }
 	    }, 
-	    "lyrics": "I lose some sales and my boss won't be happy\nBut I can't stop listening to the sound\nOf two soft voices blended in perfection\nFrom the reels of this record that I found\n\nEvery day there's a boy in the mirror\nAsking me, \"What are you doing here?\"\nFinding more that previous motifs\nGrowing increasingly unclear\n\nI've traveled far and I burned all the bridges\nI believed as soon as I hit land\nAll the other options held before me\nWither in the light of my plan\n\nSo I lose some sales and my boss won't be happy\nBut there's only one thing on my mind\nSearching boxes underneath the counter\nOn a chance that on a tape I'd find\n\nA song for\nSomeone who needs somewhere\nTo long for\n\nHomesick\n'Cause I no longer know\nWhere home is\n\n", 
+	    "lyrics": "I lose some sales and my boss won't be happy\nBut I can't stop listening to the sound\nOf two soft voices blended in perfection\n...", 
 	    "mood": {
 	        "1": {
 	            "ID": "42949", 
@@ -118,16 +117,16 @@ Note that URLs to related content (e.g. Album Art, Artist Image, etc) are not va
 
 If you don't know which album a track is on (or don't care which album version you get), you can simply leave that parameter blank:
 
-	metadata = pygn.lookupTrack(clientID, clientTag, userID, userTag, 'Kings Of Convenience', '', 'Homesick')
+	metadata = pygn.lookupTrack(clientID, userID, 'Kings Of Convenience', '', 'Homesick')
 
 pygn also provides convenience functions to look up just an Artist or just an Album. Doing:
 
-	metadata = pygn.lookupArtist(clientID, clientTag, userID, userTag, 'CSS')
+	metadata = pygn.lookupArtist(clientID, userID, 'CSS')
 
 will return the same gnmetadata object with metadata for the top album by CSS (which happens to be 'Cansei De Ser Sexy' at time of writing), with track-specific fields being blank
 
 Calling:
 
-	metadata = pygn.lookupAlbum(clientID, clientTag, userID, userTag, 'Jaga Jazzist', 'What We Must')
+	metadata = pygn.lookupAlbum(clientID, userID, 'Jaga Jazzist', 'What We Must')
 
 will return a gnmetadata object with metadata for Jaga Jazzist's "What We Must" album, again with track-specific fields empty
