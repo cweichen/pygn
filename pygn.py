@@ -1,11 +1,12 @@
 """
 pygn.py
 
-pygn (pronounced "pigeon") is a simple Python client for the Gracenote Music Web API, 
-which can retrieve Artist, Album and Track metadata with the most common options.
+pygn (pronounced "pigeon") is a simple Python client for the Gracenote Music 
+Web API, which can retrieve Artist, Album and Track metadata with the most 
+common options.
 
-You will need a Gracenote Client ID and Client Tag to use this module. 
-Please contact developers@gracenote.com to get one.
+You will need a Gracenote Client ID to use this module. Please contact 
+developers@gracenote.com to get one.
 """
 
 import xml.etree.ElementTree, urllib2, urllib, json
@@ -15,7 +16,8 @@ DEBUG = False
 
 class gnmetadata(dict):
 	"""
-	This class is a dictionary containing metadata fields that are available for the queried item.
+	This class is a dictionary containing metadata fields that are available 
+	for the queried item.
 	"""
 	def __init__(self):
 		# Basic Metadata
@@ -45,19 +47,25 @@ class gnmetadata(dict):
 		self['album_gnid'] = ''
 		self['track_gnid'] = ''		
 
-def getUserID(clientID, clientTag):
+def register(clientID):
 	"""
-	This function registers an application as a user of the Gracenote service.
-	As the quota of number of users is typically much lower than the number of
-	queries, best practices are for a given application to call this once, store
-	the UserID and UserTag in persistent storage (e.g. filesystem), and continue
-	to use these for all subsequent calls to the service.
+	This function registers an application as a user of the Gracenote service
+	
+	It takes as a parameter a clientID string in the form of 
+	"NNNNNNN-NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN" and returns a userID in a 
+	similar	format.
+	
+	As the quota of number of users (installed applications or devices) is 
+	typically much lower than the number of queries, best practices are for a
+	given installed application to call this only once, store the UserID in 
+	persistent storage (e.g. filesystem), and then use these IDs for all 
+	subsequent calls to the service.
 	"""
 	
 	# Create XML request
 	query = _gnquery()
 	query.addQuery('REGISTER')
-	query.addQueryClient(clientID, clientTag)
+	query.addQueryClient(clientID)
 	
 	queryXML = query.toString()
 	
@@ -71,12 +79,11 @@ def getUserID(clientID, clientTag):
 	responseElem = responseTree.find('RESPONSE')
 	if responseElem.attrib['STATUS'] == 'OK':
 		userElem = responseElem.find('USER')
-		userStr = userElem.text
-		userID, userTag = userStr.split('-')
+		userID = userElem.text
 	
-	return userID, userTag
+	return userID
 		
-def lookupTrack(clientID, clientTag, userID, userTag, artistName, albumTitle, trackTitle):
+def searchTrack(clientID, userID, artistName, albumTitle, trackTitle):
 	"""
 	Queries the Gracenote service for a track
 	"""
@@ -84,7 +91,7 @@ def lookupTrack(clientID, clientTag, userID, userTag, artistName, albumTitle, tr
 	# Create XML request
 	query = _gnquery()
 	
-	query.addAuth(clientID, clientTag, userID, userTag)
+	query.addAuth(clientID, userID)
 	query.addQuery('ALBUM_SEARCH')
 	query.addQueryMode('SINGLE_BEST_COVER')
 	query.addQueryTextField('ARTIST', artistName)
@@ -140,7 +147,7 @@ def lookupTrack(clientID, clientTag, userID, userTag, artistName, albumTitle, tr
 			metadata['artist_type'] = _getMultiElemText(albumElem, 'ARTIST_TYPE', 'ORD', 'ID')
 		else:
 			# Try to get OET again by fetching album by GNID
-			metadata['artist_origin'], metadata['artist_era'], metadata['artist_type'] = _getOET(clientID, clientTag, userID, userTag, metadata['album_gnid'])
+			metadata['artist_origin'], metadata['artist_era'], metadata['artist_type'] = _getOET(clientID, userID, metadata['album_gnid'])
 			
 		# Parse track metadata
 		matchedTrackElem = albumElem.find('MATCHED_TRACK_NUM')
@@ -166,37 +173,40 @@ def lookupTrack(clientID, clientTag, userID, userTag, artistName, albumTitle, tr
 				metadata['artist_type'] = _getMultiElemText(trackElem, 'ARTIST_TYPE', 'ORD', 'ID')
 				
 		# Get Lyrics
-		metadata['lyrics'] = _getLyrics(clientID, clientTag, userID, userTag, artistName, trackTitle)
+		metadata['lyrics'] = _getLyrics(clientID, userID, artistName, trackTitle)
 		
 		return metadata
 
-def lookupArtist(clientID, clientTag, userID, userTag, artistName):
+def searchArtist(clientID, userID, artistName):
 	"""
-	Queries the Gracenote service for an artist. If found, this function will return a gnmetadata object
-	containing metadata for the most popular album by this artist.
+	Queries the Gracenote service for an artist. If found, this function will
+	return a gnmetadata object containing metadata for the most popular album
+	by this artist.
 	"""
-	return lookupTrack(clientID, clientTag, userID, userTag, artistName, '', '')
+	return searchTrack(clientID, userID, artistName, '', '')
 
-def lookupAlbum(clientID, clientTag, userID, userTag, artistName, albumTitle):
+def searchAlbum(clientID, userID, artistName, albumTitle):
 	"""
 	Queries the Gracenote service for an album.
 	"""
-	return lookupTrack(clientID, clientTag, userID, userTag, artistName, albumTitle, '')
+	return searchTrack(clientID, userID, artistName, albumTitle, '')
 
 def _gnurl(clientID):
 	"""
 	Helper function to form URL to Gracenote service
 	"""
-	return 'https://c' + clientID + '.web.cddbp.net/webapi/xml/1.0/'
+	clientIDprefix = clientID.split('-')[0]
+	return 'https://c' + clientIDprefix + '.web.cddbp.net/webapi/xml/1.0/'
 	
-def _getOET(clientID, clientTag, userID, userTag, GNID):
+def _getOET(clientID, userID, GNID):
 	"""
-	Helper function to retrieve Origin, Era, and Artist Type by direct album fetch
+	Helper function to retrieve Origin, Era, and Artist Type by direct album 
+	fetch
 	"""
 	# Create XML request
 	query = _gnquery()
 	
-	query.addAuth(clientID, clientTag, userID, userTag)
+	query.addAuth(clientID, userID)
 	query.addQuery('ALBUM_FETCH')
 	query.addQueryGNID(GNID)
 	query.addQueryOption('SELECT_EXTENDED', 'ARTIST_OET')
@@ -230,15 +240,16 @@ def _getOET(clientID, clientTag, userID, userTag, GNID):
 		artistType = _getMultiElemText(albumElem, 'ARTIST_TYPE', 'ORD', 'ID')
 	return artistOrigin, artistEra, artistType
 	
-def _getLyrics(clientID, clientTag, userID, userTag, artistName, trackTitle):
+def _getLyrics(clientID, userID, artistName, trackTitle):
 	"""
-	Helper function to retrieve lyrics for specified track. First, it performs a Lyric Search by
-	Artist Name and Track Title, gets a GN ID (if found), then fetches the lyrics by GN ID.
+	Helper function to retrieve lyrics for specified track. First, it 
+	performs a Lyric Search by Artist Name and Track Title, gets a GN ID (if 
+	found), then fetches the lyrics by GN ID.
 	"""
 	# Create XML request
 	query = _gnquery()
 	
-	query.addAuth(clientID, clientTag, userID, userTag)
+	query.addAuth(clientID, userID)
 	query.addQuery('LYRIC_SEARCH')
 	query.addQueryTextField('ARTIST', artistName)
 	query.addQueryTextField('TRACK_TITLE', trackTitle)
@@ -273,7 +284,7 @@ def _getLyrics(clientID, clientTag, userID, userTag, artistName, trackTitle):
 	# Now that we have the GNID, create a new query and do a LYRIC_FETCH
 	query = _gnquery()
 	
-	query.addAuth(clientID, clientTag, userID, userTag)
+	query.addAuth(clientID, userID)
 	query.addQuery('LYRIC_FETCH')
 	query.addQueryGNID(lyricGNID)
 	queryXML = query.toString()
@@ -300,12 +311,13 @@ def _getLyrics(clientID, clientTag, userID, userTag, artistName, trackTitle):
 	if responseElem.attrib['STATUS'] != 'OK':
 		return
 	
+	# Get lyric element
 	lyricElem = responseElem.find('LYRIC')
 	lyricArtistName = _getElemText(lyricElem, 'ARTIST')
 	lyricTrackTitle = _getElemText(lyricElem, 'TITLE')
 	
+	# Copy lyrics from blocks and lines into one long string
 	lyrics = ''
-	
 	allBlockElems = lyricElem.findall('BLOCK')
 	for blockElem in allBlockElems:
 		allLineElems = blockElem.findall('LINE')
@@ -324,16 +336,13 @@ class _gnquery:
 	def __init__(self):
 		self.root = xml.etree.ElementTree.Element('QUERIES')
 		
-	def addAuth(self, clientID, clientTag, userID, userTag):
-		clientStr = '-'.join([clientID, clientTag])
-		userStr = '-'.join([userID, userTag])
-	
+	def addAuth(self, clientID, userID):
 		auth = xml.etree.ElementTree.SubElement(self.root, 'AUTH')
 		client = xml.etree.ElementTree.SubElement(auth, 'CLIENT')
 		user = xml.etree.ElementTree.SubElement(auth, 'USER')
 	
-		client.text = clientStr
-		user.text = userStr	
+		client.text = clientID
+		user.text = userID
 	
 	def addQuery(self, cmd):
 		query = xml.etree.ElementTree.SubElement(self.root, 'QUERY')
@@ -363,19 +372,18 @@ class _gnquery:
 		GNIDElem = xml.etree.ElementTree.SubElement(query, 'GN_ID')
 		GNIDElem.text = GNID
 		
-	def addQueryClient(self, clientID, clientTag):
-		clientStr = '-'.join([clientID, clientTag])
-		
+	def addQueryClient(self, clientID):
 		query = self.root.find('QUERY')
 		client = xml.etree.ElementTree.SubElement(query, 'CLIENT')
-		client.text = clientStr
+		client.text = clientID
 		
 	def toString(self):
 		return xml.etree.ElementTree.tostring(self.root)
 
 def _getElemText(parentElem, elemName, elemAttribName=None, elemAttribValue=None):
 	"""
-	XML parsing helper function to find child element with a specific name, and return the text value
+	XML parsing helper function to find child element with a specific name, 
+	and return the text value
 	"""
 	elems = parentElem.findall(elemName)
 	for elem in elems:
@@ -390,7 +398,8 @@ def _getElemText(parentElem, elemName, elemAttribName=None, elemAttribValue=None
 
 def _getElemAttrib(parentElem, elemName, elemAttribName):
 	"""
-	XML parsing helper function to find child element with a specific name, and return the value of a specified attribute
+	XML parsing helper function to find child element with a specific name, 
+	and return the value of a specified attribute
 	"""
 	elem = parentElem.find(elemName)
 	if elem is not None:
@@ -398,7 +407,8 @@ def _getElemAttrib(parentElem, elemName, elemAttribName):
 
 def _getMultiElemText(parentElem, elemName, topKey, bottomKey):
 	"""
-	XML parsing helper function to return a 2-level dict of multiple elements by a specified name, using topKey as the first key, and bottomKey as the second key
+	XML parsing helper function to return a 2-level dict of multiple elements
+	by a specified name, using topKey as the first key, and bottomKey as the second key
 	"""
 	elems = parentElem.findall(elemName)
 	result = {} # 2-level dictionary of items, keyed by topKey and then bottomKey
