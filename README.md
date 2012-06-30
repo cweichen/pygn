@@ -29,7 +29,7 @@ Once you have your Client ID and User ID, you can start making queries.
 
 To search for the Kings of Convenience track "Homesick" from their album "Riot On An Empty Street", do:
 
-	metadata = pygn.lookupTrack(clientID, userID, 'Kings Of Convenience', 'Riot On An Empty Street', 'Homesick')
+	metadata = pygn.searchTrack(clientID, userID, 'Kings Of Convenience', 'Riot On An Empty Street', 'Homesick')
 
 The returned gnmetadata object is a Python dict containing multiple metadata fields.
 	
@@ -117,16 +117,16 @@ Note that URLs to related content (e.g. Album Art, Artist Image, etc) are not va
 
 If you don't know which album a track is on (or don't care which album version you get), you can simply leave that parameter blank:
 
-	metadata = pygn.lookupTrack(clientID, userID, 'Kings Of Convenience', '', 'Homesick')
+	metadata = pygn.searchTrack(clientID, userID, 'Kings Of Convenience', '', 'Homesick')
 
 pygn also provides convenience functions to look up just an Artist or just an Album. Doing:
 
-	metadata = pygn.lookupArtist(clientID, userID, 'CSS')
+	metadata = pygn.searchArtist(clientID, userID, 'CSS')
 
 will return the same gnmetadata object with metadata for the top album by CSS (which happens to be 'Cansei De Ser Sexy' at time of writing), with track-specific fields being blank
 
 Calling:
 
-	metadata = pygn.lookupAlbum(clientID, userID, 'Jaga Jazzist', 'What We Must')
+	metadata = pygn.searchAlbum(clientID, userID, 'Jaga Jazzist', 'What We Must')
 
 will return a gnmetadata object with metadata for Jaga Jazzist's "What We Must" album, again with track-specific fields empty
