@@ -280,7 +280,6 @@ def _getLyrics(clientID, userID, artistName, trackTitle):
 	lyricElem = responseElem.find('LYRIC') # Just take the first one
 	lyricGNID = _getElemText(lyricElem, 'GN_ID')
 		
-	print 'lyricGNID: ' + lyricGNID
 	# Now that we have the GNID, create a new query and do a LYRIC_FETCH
 	query = _gnquery()
 	
