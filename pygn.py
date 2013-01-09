@@ -41,7 +41,6 @@ class gnmetadata(dict):
 		self['artist_image_url'] = ''
 		self['artist_bio_url'] = ''
 		self['review_url'] = ''
-		self['lyrics'] = ''
 
 		# Gracenote IDs
 		self['album_gnid'] = ''
@@ -172,8 +171,6 @@ def searchTrack(clientID, userID, artistName, albumTitle, trackTitle):
 			if trackElem.find('ARTIST_TYPE') is not None:
 				metadata['artist_type'] = _getMultiElemText(trackElem, 'ARTIST_TYPE', 'ORD', 'ID')
 				
-		# Get Lyrics
-		metadata['lyrics'] = _getLyrics(clientID, userID, artistName, trackTitle)
 		
 		return metadata
 
@@ -239,92 +236,6 @@ def _getOET(clientID, userID, GNID):
 		artistEra = _getMultiElemText(albumElem, 'ARTIST_ERA', 'ORD', 'ID')
 		artistType = _getMultiElemText(albumElem, 'ARTIST_TYPE', 'ORD', 'ID')
 	return artistOrigin, artistEra, artistType
-	
-def _getLyrics(clientID, userID, artistName, trackTitle):
-	"""
-	Helper function to retrieve lyrics for specified track. First, it 
-	performs a Lyric Search by Artist Name and Track Title, gets a GN ID (if 
-	found), then fetches the lyrics by GN ID.
-	"""
-	# Create XML request
-	query = _gnquery()
-	
-	query.addAuth(clientID, userID)
-	query.addQuery('LYRIC_SEARCH')
-	query.addQueryTextField('ARTIST', artistName)
-	query.addQueryTextField('TRACK_TITLE', trackTitle)
-	queryXML = query.toString()
-	
-	if DEBUG:
-		print '------------'
-		print 'QUERY XML (from _getLyrics())'
-		print '------------'
-		print queryXML
-	
-	# POST query
-	response = urllib2.urlopen(_gnurl(clientID), queryXML)
-	responseXML = response.read()
-	
-	if DEBUG:
-		print '------------'
-		print 'RESPONSE XML (from _getLyrics())'
-		print '------------'
-		print responseXML
-	
-	# Parse XML
-	responseTree = xml.etree.ElementTree.fromstring(responseXML)
-	responseElem = responseTree.find('RESPONSE')
-	if responseElem.attrib['STATUS'] != 'OK':
-		return
-	
-	lyricElem = responseElem.find('LYRIC') # Just take the first one
-	lyricGNID = _getElemText(lyricElem, 'GN_ID')
-		
-	# Now that we have the GNID, create a new query and do a LYRIC_FETCH
-	query = _gnquery()
-	
-	query.addAuth(clientID, userID)
-	query.addQuery('LYRIC_FETCH')
-	query.addQueryGNID(lyricGNID)
-	queryXML = query.toString()
-	
-	if DEBUG:
-		print '------------'
-		print 'QUERY XML (from _getLyrics() 2)'
-		print '------------'
-		print queryXML
-	
-	# POST query
-	response = urllib2.urlopen(_gnurl(clientID), queryXML)
-	responseXML = response.read()
-	
-	if DEBUG:
-		print '------------'
-		print 'RESPONSE XML (from _getLyrics() 2)'
-		print '------------'
-		print responseXML
-	
-	# Parse XML
-	responseTree = xml.etree.ElementTree.fromstring(responseXML)
-	responseElem = responseTree.find('RESPONSE')
-	if responseElem.attrib['STATUS'] != 'OK':
-		return
-	
-	# Get lyric element
-	lyricElem = responseElem.find('LYRIC')
-	lyricArtistName = _getElemText(lyricElem, 'ARTIST')
-	lyricTrackTitle = _getElemText(lyricElem, 'TITLE')
-	
-	# Copy lyrics from blocks and lines into one long string
-	lyrics = ''
-	allBlockElems = lyricElem.findall('BLOCK')
-	for blockElem in allBlockElems:
-		allLineElems = blockElem.findall('LINE')
-		for lineElem in allLineElems:
-			lyrics += urllib.unquote(lineElem.text) + '\n'
-		lyrics += '\n'
-	
-	return lyrics
 	
 class _gnquery:
 	"""
