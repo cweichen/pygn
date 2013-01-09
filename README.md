@@ -14,7 +14,7 @@ Since pygn is (so far) contained in a single Python file, no installer is provid
 
 ##Getting Started
 
-You will need a Gracenote Client ID to use this module. Please contact developers@gracenote.com to get these.
+You will need a Gracenote Client ID to use this module. Please visit https://developer.gracenote.com to get yours.
 
 Each installed application also needs to have a User ID, which may be obtained by registering your Client ID with the Gracenote API. To do this, do:
 
