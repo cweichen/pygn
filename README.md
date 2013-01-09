@@ -81,7 +81,6 @@ The returned gnmetadata object is a Python dict containing multiple metadata fie
 	            "TEXT": "Indie Pop"
 	        }
 	    }, 
-	    "lyrics": "I lose some sales and my boss won't be happy\nBut I can't stop listening to the sound\nOf two soft voices blended in perfection\n...", 
 	    "mood": {
 	        "1": {
 	            "ID": "42949", 
