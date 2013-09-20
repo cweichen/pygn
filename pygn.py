@@ -82,10 +82,18 @@ def register(clientID):
 	
 	return userID
 		
-def searchTrack(clientID, userID, artistName, albumTitle, trackTitle):
+def search(clientID='', userID='', artist='', album='', track=''):
 	"""
-	Queries the Gracenote service for a track
+	Queries the Gracenote service for a track, album, or artist
 	"""
+
+	if clientID=='' or userID=='':
+		print 'ClientID and UserID are required'
+		return None
+
+	if artist=='' and album=='' and track=='':
+		print 'Must query with at least one field (artist, album, track)'
+		return None
 	
 	# Create XML request
 	query = _gnquery()
@@ -93,9 +101,9 @@ def searchTrack(clientID, userID, artistName, albumTitle, trackTitle):
 	query.addAuth(clientID, userID)
 	query.addQuery('ALBUM_SEARCH')
 	query.addQueryMode('SINGLE_BEST_COVER')
-	query.addQueryTextField('ARTIST', artistName)
-	query.addQueryTextField('ALBUM_TITLE', albumTitle)
-	query.addQueryTextField('TRACK_TITLE', trackTitle)
+	query.addQueryTextField('ARTIST', artist)
+	query.addQueryTextField('ALBUM_TITLE', album)
+	query.addQueryTextField('TRACK_TITLE', track)
 	query.addQueryOption('SELECT_EXTENDED', 'COVER,REVIEW,ARTIST_BIOGRAPHY,ARTIST_IMAGE,ARTIST_OET,MOOD,TEMPO')
 	query.addQueryOption('SELECT_DETAIL', 'GENRE:3LEVEL,MOOD:2LEVEL,TEMPO:3LEVEL,ARTIST_ORIGIN:4LEVEL,ARTIST_ERA:2LEVEL,ARTIST_TYPE:2LEVEL')
 	
@@ -173,20 +181,6 @@ def searchTrack(clientID, userID, artistName, albumTitle, trackTitle):
 				
 		
 		return metadata
-
-def searchArtist(clientID, userID, artistName):
-	"""
-	Queries the Gracenote service for an artist. If found, this function will
-	return a gnmetadata object containing metadata for the most popular album
-	by this artist.
-	"""
-	return searchTrack(clientID, userID, artistName, '', '')
-
-def searchAlbum(clientID, userID, artistName, albumTitle):
-	"""
-	Queries the Gracenote service for an album.
-	"""
-	return searchTrack(clientID, userID, artistName, albumTitle, '')
 
 def _gnurl(clientID):
 	"""
