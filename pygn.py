@@ -182,6 +182,84 @@ def search(clientID='', userID='', artist='', album='', track=''):
 		
 		return metadata
 
+def get_discography(clientID='', userID='', artist='', rangeStart=1, rangeEnd=10):
+	"""
+	Queries the Gracenote service for all albums containing an artist
+	"""
+
+	if clientID=='' or userID=='':
+		print 'ClientID and UserID are required'
+		return None
+
+	if artist=='':
+		print 'Must specify artist'
+		return None
+
+	# Create XML request
+	query = _gnquery()
+
+	query.addAuth(clientID, userID)
+	query.addQuery('ALBUM_SEARCH')
+	query.addQueryTextField('ARTIST', artist)
+	query.addQueryOption('SELECT_EXTENDED', 'COVER,REVIEW,ARTIST_BIOGRAPHY,ARTIST_IMAGE,ARTIST_OET,MOOD,TEMPO')
+	query.addQueryOption('SELECT_DETAIL', 'GENRE:3LEVEL,MOOD:2LEVEL,TEMPO:3LEVEL,ARTIST_ORIGIN:4LEVEL,ARTIST_ERA:2LEVEL,ARTIST_TYPE:2LEVEL')
+	query.addQueryRange(rangeStart,rangeEnd)
+
+	queryXML = query.toString()
+
+	if DEBUG:
+		print '------------'
+		print 'QUERY XML'
+		print '------------'
+		print queryXML
+
+	# POST query
+	response = urllib2.urlopen(_gnurl(clientID), queryXML)
+	responseXML = response.read()
+
+	if DEBUG:
+		print '------------'
+		print 'RESPONSE XML'
+		print '------------'
+		print responseXML
+
+	# Create result array
+	discography = []
+
+	# Parse response
+	responseTree = xml.etree.ElementTree.fromstring(responseXML)
+	responseElem = responseTree.find('RESPONSE')
+	if responseElem.attrib['STATUS'] == 'OK':
+		# Find Album element
+		albumElems = responseElem.findall('ALBUM')
+
+	for albumElem in albumElems:
+
+		metadata = gnmetadata()
+
+		# Parse album metadata
+		metadata['album_gnid'] = _getElemText(albumElem, 'GN_ID')
+		metadata['album_artist_name'] = _getElemText(albumElem, 'ARTIST')
+
+		metadata['album_title'] = _getElemText(albumElem, 'TITLE')
+		metadata['album_year'] = _getElemText(albumElem, 'DATE')
+		metadata['album_art_url'] = _getElemText(albumElem, 'URL', 'TYPE', 'COVERART')
+		metadata['genre'] = _getMultiElemText(albumElem, 'GENRE', 'ORD', 'ID')
+		metadata['artist_image_url'] = _getElemText(albumElem, 'URL', 'TYPE', 'ARTIST_IMAGE')
+		metadata['artist_bio_url'] = _getElemText(albumElem, 'URL', 'TYPE', 'ARTIST_BIOGRAPHY')
+		metadata['review_url'] = _getElemText(albumElem, 'URL', 'TYPE', 'REVIEW')
+
+		# Look for OET
+		artistOriginElem = albumElem.find('ARTIST_ORIGIN')
+		if artistOriginElem is not None:
+			metadata['artist_origin'] = _getMultiElemText(albumElem, 'ARTIST_ORIGIN', 'ORD', 'ID')
+			metadata['artist_era'] = _getMultiElemText(albumElem, 'ARTIST_ERA', 'ORD', 'ID')
+			metadata['artist_type'] = _getMultiElemText(albumElem, 'ARTIST_TYPE', 'ORD', 'ID')
+
+		discography.append(metadata)
+
+	return discography
+	
 def fetch(clientID='', userID='', GNID=''):
 	"""
 	Fetches a track or album by GN ID
