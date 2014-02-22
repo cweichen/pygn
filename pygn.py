@@ -456,6 +456,14 @@ class _gnquery:
 		client = xml.etree.ElementTree.SubElement(query, 'CLIENT')
 		client.text = clientID
 		
+	def addQueryRange(self, start, end):
+		query = self.root.find('QUERY')
+		queryRange = xml.etree.ElementTree.SubElement(query, 'RANGE')
+		rangeStart = xml.etree.ElementTree.SubElement(queryRange, 'START')
+		rangeStart.text = str(start)
+		rangeEnd = xml.etree.ElementTree.SubElement(queryRange, 'END')
+		rangeEnd.text = str(end)
+		
 	def toString(self):
 		return xml.etree.ElementTree.tostring(self.root)
 
