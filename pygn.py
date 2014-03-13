@@ -52,7 +52,7 @@ def register(clientID):
 	
 	It takes as a parameter a clientID string in the form of 
 	"NNNNNNN-NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN" and returns a userID in a 
-	similar	format.
+	similar format.
 	
 	As the quota of number of users (installed applications or devices) is 
 	typically much lower than the number of queries, best practices are for a
@@ -186,8 +186,31 @@ def search(clientID='', userID='', artist='', album='', track='', toc=''):
 				metadata['artist_era'] = _getMultiElemText(trackElem, 'ARTIST_ERA', 'ORD', 'ID')
 			if trackElem.find('ARTIST_TYPE') is not None:
 				metadata['artist_type'] = _getMultiElemText(trackElem, 'ARTIST_TYPE', 'ORD', 'ID')
-				
-		
+
+		# Parse tracklist
+		metadata['tracks'] = []
+		for trackElem in albumElem.iter('TRACK'):
+			trackdata = {}
+			
+			trackdata['track_number'] = _getElemText(trackElem, 'TRACK_NUM')
+			trackdata['track_gnid'] = _getElemText(trackElem, 'GN_ID')
+			trackdata['track_title'] = _getElemText(trackElem, 'TITLE')
+			trackdata['track_artist_name'] = _getElemText(trackElem, 'ARTIST')
+
+			trackdata['mood'] = _getMultiElemText(trackElem, 'MOOD', 'ORD', 'ID')
+			trackdata['tempo'] = _getMultiElemText(trackElem, 'TEMPO', 'ORD', 'ID')
+			
+			# If track-level GOET exists, overwrite metadata from album			
+			if trackElem.find('GENRE') is not None:
+				trackdata['genre']	 = _getMultiElemText(trackElem, 'GENRE', 'ORD', 'ID')
+			if trackElem.find('ARTIST_ORIGIN') is not None:
+				trackdata['artist_origin'] = _getMultiElemText(trackElem, 'ARTIST_ORIGIN', 'ORD', 'ID')
+			if trackElem.find('ARTIST_ERA') is not None:
+				trackdata['artist_era'] = _getMultiElemText(trackElem, 'ARTIST_ERA', 'ORD', 'ID')
+			if trackElem.find('ARTIST_TYPE') is not None:
+				trackdata['artist_type'] = _getMultiElemText(trackElem, 'ARTIST_TYPE', 'ORD', 'ID')
+			metadata['tracks'].append(trackdata)
+
 		return metadata
 
 def get_discography(clientID='', userID='', artist='', rangeStart=1, rangeEnd=10):
@@ -263,6 +286,30 @@ def get_discography(clientID='', userID='', artist='', rangeStart=1, rangeEnd=10
 			metadata['artist_origin'] = _getMultiElemText(albumElem, 'ARTIST_ORIGIN', 'ORD', 'ID')
 			metadata['artist_era'] = _getMultiElemText(albumElem, 'ARTIST_ERA', 'ORD', 'ID')
 			metadata['artist_type'] = _getMultiElemText(albumElem, 'ARTIST_TYPE', 'ORD', 'ID')
+
+		# Parse tracklist
+		metadata['tracks'] = []
+		for trackElem in albumElem.iter('TRACK'):
+			trackdata = {}
+			
+			trackdata['track_number'] = _getElemText(trackElem, 'TRACK_NUM')
+			trackdata['track_gnid'] = _getElemText(trackElem, 'GN_ID')
+			trackdata['track_title'] = _getElemText(trackElem, 'TITLE')
+			trackdata['track_artist_name'] = _getElemText(trackElem, 'ARTIST')
+
+			trackdata['mood'] = _getMultiElemText(trackElem, 'MOOD', 'ORD', 'ID')
+			trackdata['tempo'] = _getMultiElemText(trackElem, 'TEMPO', 'ORD', 'ID')
+			
+			# If track-level GOET exists, overwrite metadata from album			
+			if trackElem.find('GENRE') is not None:
+				trackdata['genre']	 = _getMultiElemText(trackElem, 'GENRE', 'ORD', 'ID')
+			if trackElem.find('ARTIST_ORIGIN') is not None:
+				trackdata['artist_origin'] = _getMultiElemText(trackElem, 'ARTIST_ORIGIN', 'ORD', 'ID')
+			if trackElem.find('ARTIST_ERA') is not None:
+				trackdata['artist_era'] = _getMultiElemText(trackElem, 'ARTIST_ERA', 'ORD', 'ID')
+			if trackElem.find('ARTIST_TYPE') is not None:
+				trackdata['artist_type'] = _getMultiElemText(trackElem, 'ARTIST_TYPE', 'ORD', 'ID')
+			metadata['tracks'].append(trackdata)
 
 		discography.append(metadata)
 
@@ -362,6 +409,30 @@ def fetch(clientID='', userID='', GNID=''):
 				metadata['artist_era'] = _getMultiElemText(trackElem, 'ARTIST_ERA', 'ORD', 'ID')
 			if trackElem.find('ARTIST_TYPE') is not None:
 				metadata['artist_type'] = _getMultiElemText(trackElem, 'ARTIST_TYPE', 'ORD', 'ID')
+
+		# Parse tracklist
+		metadata['tracks'] = []
+		for trackElem in albumElem.iter('TRACK'):
+			trackdata = {}
+			
+			trackdata['track_number'] = _getElemText(trackElem, 'TRACK_NUM')
+			trackdata['track_gnid'] = _getElemText(trackElem, 'GN_ID')
+			trackdata['track_title'] = _getElemText(trackElem, 'TITLE')
+			trackdata['track_artist_name'] = _getElemText(trackElem, 'ARTIST')
+
+			trackdata['mood'] = _getMultiElemText(trackElem, 'MOOD', 'ORD', 'ID')
+			trackdata['tempo'] = _getMultiElemText(trackElem, 'TEMPO', 'ORD', 'ID')
+			
+			# If track-level GOET exists, overwrite metadata from album			
+			if trackElem.find('GENRE') is not None:
+				trackdata['genre']	 = _getMultiElemText(trackElem, 'GENRE', 'ORD', 'ID')
+			if trackElem.find('ARTIST_ORIGIN') is not None:
+				trackdata['artist_origin'] = _getMultiElemText(trackElem, 'ARTIST_ORIGIN', 'ORD', 'ID')
+			if trackElem.find('ARTIST_ERA') is not None:
+				trackdata['artist_era'] = _getMultiElemText(trackElem, 'ARTIST_ERA', 'ORD', 'ID')
+			if trackElem.find('ARTIST_TYPE') is not None:
+				trackdata['artist_type'] = _getMultiElemText(trackElem, 'ARTIST_TYPE', 'ORD', 'ID')
+			metadata['tracks'].append(trackdata)
 
 		return metadata
 
