@@ -131,8 +131,9 @@ Calling:
 
 will return a gnmetadata object with metadata for Jaga Jazzist's "What We Must" album, again with track-specific fields empty
 
-#The Rhythm Playlist API 
-The Rhythm API enables you to generate a playlist by setting any seed. This could be a song, an artist, a genre, a mood, an era or any combination of these inputs.
+#Rhythm API 
+The Rhythm API generates a playlist based on a song, an artist, a genre, a mood, an era or any combination of these inputs.
+
 A radio is set up as follows:
 
 createRadio(clientID='', userID='', artist='', track='', mood='', era='', genre='', popularity ='', similarity = '', count='10')
@@ -142,78 +143,9 @@ track: the title of the song
 mood: a mood ID from the moods below
 era: an era ID from the eras below
 genre: a genre ID from the genres below
-popularity: The popularity treshold of the song, 0 means any popularity, 1000 means only the most popular songs. 
+popularity: The popularity threshold of the song, 0 means any popularity, 1000 means only the most popular songs. 
 Similarity: How similar should the playlist be to the seed. This parameter determines how narrow the playlist is. 1000 set the
 count: Number of songs in the intially created playlist, specify any number between 2 and 25 to generate a playlist
-
-During the playback, you could give
-
-
-#moods IDs for getting a radio playlist 
-   <MOOD ID="65322">Peaceful</MOOD>
-   <MOOD ID="65323">Romantic</MOOD>
-   <MOOD ID="65324">Sentimental</MOOD>
-   <MOOD ID="42942">Tender</MOOD>
-   <MOOD ID="42946">Easygoing</MOOD>
-   <MOOD ID="65325">Yearning</MOOD>
-   <MOOD ID="42954">Sophisticated</MOOD>
-   <MOOD ID="42947">Sensual</MOOD>
-   <MOOD ID="65326">Cool</MOOD>
-   <MOOD ID="65327">Gritty</MOOD>
-   <MOOD ID="42948">Somber</MOOD>
-   <MOOD ID="42949">Melancholy</MOOD>
-   <MOOD ID="65328">Serious</MOOD>
-   <MOOD ID="65329">Brooding</MOOD>
-   <MOOD ID="42953">Fiery</MOOD>
-   <MOOD ID="42955">Urgent</MOOD>
-   <MOOD ID="42951">Defiant</MOOD>
-   <MOOD ID="42958">Aggressive</MOOD>
-   <MOOD ID="65330">Rowdy</MOOD>
-   <MOOD ID="42960">Excited</MOOD>
-   <MOOD ID="42961">Energizing</MOOD>
-   <MOOD ID="42945">Empowering</MOOD>
-   <MOOD ID="65331">Stirring</MOOD>
-   <MOOD ID="65332">Lively</MOOD>
-   <MOOD ID="65333">Upbeat</MOOD>
-
-#eras IDs for getting a radio playlist
-   <ERA ID="42877">2010&apos;s</ERA>
-   <ERA ID="29483">2000&apos;s</ERA>
-   <ERA ID="29484">1990&apos;s</ERA>
-   <ERA ID="29485">1980&apos;s</ERA>
-   <ERA ID="29486">1970&apos;s</ERA>
-   <ERA ID="29487">1960&apos;s</ERA>
-   <ERA ID="29488">1950&apos;s</ERA>
-   <ERA ID="29489">1940&apos;s</ERA>
-   <ERA ID="29490">1930&apos;s</ERA>
-
-#genre ID for getting a radio playlist
-
-   <GENRE ID="25982">Latin</GENRE>
-   <GENRE ID="36060">Blues</GENRE>
-   <GENRE ID="36061">Classical</GENRE>
-   <GENRE ID="25984">World</GENRE>
-   <GENRE ID="36055">Electronica</GENRE>
-   <GENRE ID="36059">Country &amp; Western</GENRE>
-   <GENRE ID="36064">Comedy, Spoken &amp; Other</GENRE>
-   <GENRE ID="25978">Traditional Pop</GENRE>
-   <GENRE ID="25971">Folk</GENRE>
-   <GENRE ID="36051">Punk</GENRE>
-   <GENRE ID="36062">New Age</GENRE>
-   <GENRE ID="25964">Rock</GENRE>
-   <GENRE ID="36057">Soul/R&amp;B</GENRE>
-   <GENRE ID="36063">Soundtrack</GENRE>
-   <GENRE ID="36065">Reggae</GENRE>
-   <GENRE ID="25976">Gospel &amp; Christian</GENRE>
-   <GENRE ID="25980">Children&apos;s</GENRE>
-   <GENRE ID="25961">Alternative</GENRE>
-   <GENRE ID="36053">Metal</GENRE>
-   <GENRE ID="36058">Rap/Hip-Hop</GENRE>
-   <GENRE ID="36056">Pop</GENRE>
-   <GENRE ID="36054">Dance &amp; House</GENRE>
-   <GENRE ID="25965">Oldies</GENRE>
-   <GENRE ID="25974">Jazz</GENRE>
-   <GENRE ID="36052">Indie</GENRE>
 
 #Events 
 TRACK_PLAYED - track marked as played. Moves the play queue (drops track being played and adds additional track to end of queue)
