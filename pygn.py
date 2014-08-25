@@ -254,8 +254,6 @@ def search(clientID='', userID='', artist='', album='', track='', toc=''):
 	
 	queryXML = query.toString()
 	
-
-	DEBUG = True
 	if DEBUG:
 		print '------------'
 		print 'QUERY XML'
