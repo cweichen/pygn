@@ -9,7 +9,16 @@ You will need a Gracenote Client ID to use this module. Please contact
 developers@gracenote.com to get one.
 """
 
-import xml.etree.ElementTree, urllib2, urllib, json
+from __future__ import print_function
+import xml.etree.ElementTree, json
+
+try:
+    import urllib.request as urllib_request #for python 3
+    import urllib.parse   as urllib_parse
+
+except ImportError:
+    import urllib2 as urllib_request # for python 2
+    import urllib as urllib_parse # for python 2
 
 # Set DEBUG to True if you want this module to print out the query and response XML
 DEBUG = False
@@ -75,7 +84,7 @@ def register(clientID):
 	queryXML = query.toString()
 	
 	# POST query
-	response = urllib2.urlopen(_gnurl(clientID), queryXML)
+	response = urllib_request.urlopen(_gnurl(clientID), queryXML)
 	responseXML = response.read()
 	
 	# Parse response
@@ -96,11 +105,11 @@ def createRadio(clientID='', userID='', artist='', track='', mood='', era='', ge
 	Queries a Radio playlist
 	"""
 	if clientID=='' or userID=='':
-		print 'ClientID and UserID are required'
+		print('ClientID and UserID are required')
 		return None
 
 	if artist=='' and track=='' and mood=='' and era=='' and genre=='':
-		print 'Must query with at least one field (artist, track, genre, mood, era)'
+		print('Must query with at least one field (artist, track, genre, mood, era)')
 		return None
 
 	#Create XML request
@@ -135,11 +144,11 @@ def createRadio(clientID='', userID='', artist='', track='', mood='', era='', ge
 	queryXML = query.toString()
 
 	if DEBUG:
-		print 'QUERY:'
-		print queryXML
+		print('QUERY:')
+		print(queryXML)
 
 	# POST query
-	response = urllib2.urlopen(_gnurl(clientID), queryXML)
+	response = urllib_request.urlopen(_gnurl(clientID), queryXML)
 	responseXML = response.read()
 
 
@@ -149,7 +158,7 @@ def createRadio(clientID='', userID='', artist='', track='', mood='', era='', ge
 		track = _parseRadioMetadata(responseXML,x)		
 		myPlaylist.append(track)
 	
-	print responseXML
+	print(responseXML)
 	
 	return myPlaylist
 
@@ -161,11 +170,11 @@ def createRadio(clientID='', userID='', artist='', track='', mood='', era='', ge
 def radioEvent(clientID='', userID='', radioID='', gnID='', event ='TRACK_PLAYED', count='10', popularity ='', similarity = ''):
 
 	if clientID=='' or userID=='':
-		print 'ClientID and UserID are required'
+		print('ClientID and UserID are required')
 		return None
 
 	if radioID=='' or gnID=='':
-		print 'Event query must contain the radioID and gnID'
+		print('Event query must contain the radioID and gnID')
 		return None
 
 	#Create XML request
@@ -194,12 +203,12 @@ def radioEvent(clientID='', userID='', radioID='', gnID='', event ='TRACK_PLAYED
 	
 	queryXML = query.toString()
 	if DEBUG:	
-		print 'QUERY:'
-		print queryXML
+		print('QUERY:')
+		print(queryXML)
 
 	
 	# POST query
-	response = urllib2.urlopen(_gnurl(clientID), queryXML)
+	response = urllib_request.urlopen(_gnurl(clientID), queryXML)
 	responseXML = response.read()
 
 
@@ -209,7 +218,7 @@ def radioEvent(clientID='', userID='', radioID='', gnID='', event ='TRACK_PLAYED
 		track = _parseRadioMetadata(responseXML,x)		
 		myPlaylist.append(track)
 	
-	print responseXML
+	print(responseXML)
 	
 	return myPlaylist
 	
@@ -227,11 +236,11 @@ def search(clientID='', userID='', artist='', album='', track='', toc=''):
 	"""
 
 	if clientID=='' or userID=='':
-		print 'ClientID and UserID are required'
+		print('ClientID and UserID are required')
 		return None
 
 	if artist=='' and album=='' and track=='' and toc=='':
-		print 'Must query with at least one field (artist, album, track, toc)'
+		print('Must query with at least one field (artist, album, track, toc)')
 		return None
 	
 	# Create XML request
@@ -255,20 +264,20 @@ def search(clientID='', userID='', artist='', album='', track='', toc=''):
 	queryXML = query.toString()
 	
 	if DEBUG:
-		print '------------'
-		print 'QUERY XML'
-		print '------------'
-		print queryXML
+		print('------------')
+		print('QUERY XML')
+		print('------------')
+		print(queryXML)
 	
 	# POST query
-	response = urllib2.urlopen(_gnurl(clientID), queryXML)
+	response = urllib_request.urlopen(_gnurl(clientID), queryXML)
 	responseXML = response.read()
 	
 	if DEBUG:
-		print '------------'
-		print 'RESPONSE XML'
-		print '------------'
-		print responseXML
+		print('------------')
+		print('RESPONSE XML')
+		print('------------')
+		print(responseXML)
 
 	# Create GNTrackMetadata object
 	metadata = gnmetadata()
@@ -429,11 +438,11 @@ def get_discography(clientID='', userID='', artist='', rangeStart=1, rangeEnd=10
 	"""
 
 	if clientID=='' or userID=='':
-		print 'ClientID and UserID are required'
+		print('ClientID and UserID are required')
 		return None
 
 	if artist=='':
-		print 'Must specify artist'
+		print('Must specify artist')
 		return None
 
 	# Create XML request
@@ -449,20 +458,20 @@ def get_discography(clientID='', userID='', artist='', rangeStart=1, rangeEnd=10
 	queryXML = query.toString()
 
 	if DEBUG:
-		print '------------'
-		print 'QUERY XML'
-		print '------------'
-		print queryXML
+		print('------------')
+		print('QUERY XML')
+		print('------------')
+		print(queryXML)
 
 	# POST query
-	response = urllib2.urlopen(_gnurl(clientID), queryXML)
+	response = urllib_request.urlopen(_gnurl(clientID), queryXML)
 	responseXML = response.read()
 
 	if DEBUG:
-		print '------------'
-		print 'RESPONSE XML'
-		print '------------'
-		print responseXML
+		print('------------')
+		print('RESPONSE XML')
+		print('------------')
+		print(responseXML)
 
 	# Create result array
 	discography = []
@@ -531,11 +540,11 @@ def fetch(clientID='', userID='', GNID=''):
 	"""
 
 	if clientID=='' or userID=='':
-		print 'ClientID and UserID are required'
+		print('ClientID and UserID are required')
 		return None
 
 	if GNID=='':
-		print 'GNID is required'
+		print('GNID is required')
 		return None
 	
 	# Create XML request
@@ -550,20 +559,20 @@ def fetch(clientID='', userID='', GNID=''):
 	queryXML = query.toString()
 	
 	if DEBUG:
-		print '------------'
-		print 'QUERY XML'
-		print '------------'
-		print queryXML
+		print('------------')
+		print('QUERY XML')
+		print('------------')
+		print(queryXML)
 	
 	# POST query
-	response = urllib2.urlopen(_gnurl(clientID), queryXML)
+	response = urllib_request.urlopen(_gnurl(clientID), queryXML)
 	responseXML = response.read()
 	
 	if DEBUG:
-		print '------------'
-		print 'RESPONSE XML'
-		print '------------'
-		print responseXML
+		print('------------')
+		print('RESPONSE XML')
+		print('------------')
+		print(responseXML)
 
 	# Create GNTrackMetadata object
 	metadata = gnmetadata()
@@ -670,20 +679,20 @@ def _getOET(clientID, userID, GNID):
 	queryXML = query.toString()
 	
 	if DEBUG:
-		print '------------'
-		print 'QUERY XML (from _getOET())'
-		print '------------'
-		print queryXML
+		print('------------')
+		print('QUERY XML (from _getOET())')
+		print('------------')
+		print(queryXML)
 	
 	# POST query
-	response = urllib2.urlopen(_gnurl(clientID), queryXML)
+	response = urllib_request.urlopen(_gnurl(clientID), queryXML)
 	albumXML = response.read()
 	
 	if DEBUG:
-		print '------------'
-		print 'RESPONSE XML (from _getOET())'
-		print '------------'
-		print albumXML
+		print('------------')
+		print('RESPONSE XML (from _getOET())')
+		print('------------')
+		print(albumXML)
 	
 	# Parse XML
 	responseTree = xml.etree.ElementTree.fromstring(albumXML)
@@ -819,11 +828,11 @@ def _getElemText(parentElem, elemName, elemAttribName=None, elemAttribValue=None
 	for elem in elems:
 		if elemAttribName is not None and elemAttribValue is not None:
 			if elem.attrib[elemAttribName] == elemAttribValue:
-				return urllib.unquote(elem.text)
+				return urllib_parse.unquote(elem.text)
 			else:
 				continue
 		else: # Just return the first one
-			return urllib.unquote(elem.text)
+			return urllib_parse.unquote(elem.text)
 	return ''
 
 def _getElemAttrib(parentElem, elemName, elemAttribName):
