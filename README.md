@@ -13,7 +13,7 @@ pygn allows you to look up artists, albums, and tracks in the Gracenote database
 
 ## Installation
 
-Since pygn is (so far) contained in a single Python file, no installer is provided. Simply copy pygn.py to your working directory, or to your Python site-packages/dist-packages directory, and call 'import pygn'!
+Since pygn is (so far) contained in a single Python file, no installer is provided. Simply copy pygn.py to your working directory, or to your Python site-packages/dist-packages directory, and call `import pygn`!
 
 ## Getting Started
 
@@ -131,28 +131,28 @@ Calling:
 
 will return a gnmetadata object with metadata for Jaga Jazzist's "What We Must" album, again with track-specific fields empty
 
-#Rhythm API 
+# Rhythm API 
 The Rhythm API generates a playlist based on a song, an artist, a genre, a mood, an era or any combination of these inputs.
 
 A radio is set up as follows:
 
-createRadio(clientID='', userID='', artist='', track='', mood='', era='', genre='', popularity ='', similarity = '', count='10')
+    createRadio(clientID='', userID='', artist='', track='', mood='', era='', genre='', popularity ='', similarity = '', count='10')
 
-artist: the track artist
-track: the title of the song
-mood: a mood ID from the moods below
-era: an era ID from the eras below
-genre: a genre ID from the genres below
-popularity: The popularity threshold of the song, 0 means any popularity, 1000 means only the most popular songs. 
-Similarity: How similar should the playlist be to the seed. This parameter determines how narrow the playlist is. 1000 set the
+artist: the track artist. 
+track: the title of the song. 
+mood: a mood ID from the moods below. 
+era: an era ID from the eras below. 
+genre: a genre ID from the genres below. 
+popularity: The popularity threshold of the song, 0 means any popularity, 1000 means only the most popular songs.  
+Similarity: How similar should the playlist be to the seed. This parameter determines how narrow the playlist is. 
 count: Number of songs in the intially created playlist, specify any number between 2 and 25 to generate a playlist
 
-#Events 
-TRACK_PLAYED - track marked as played. Moves the play queue (drops track being played and adds additional track to end of queue)
-TRACK_SKIPPED - track marked as skipped. Moves the play queue.
-TRACK_LIKE - track marked as liked. Does not move the play queue.
-TRACK_DISLIKE - track marked as disliked. Refreshes the playlist queue.
-ARTIST_LIKE - artist marked as liked. Does not move the play queue.
-ARTIST_DISLIKE  - artist marked as disliked. Refreshes the playlist queue.
+# Events 
+TRACK_PLAYED - track marked as played. Moves the play queue (drops track being played and adds additional track to end of queue). 
+TRACK_SKIPPED - track marked as skipped. Moves the play queue.  
+TRACK_LIKE - track marked as liked. Does not move the play queue.  
+TRACK_DISLIKE - track marked as disliked. Refreshes the playlist queue.  
+ARTIST_LIKE - artist marked as liked. Does not move the play queue.  
+ARTIST_DISLIKE  - artist marked as disliked. Refreshes the playlist queue.  
 
 
