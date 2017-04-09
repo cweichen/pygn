@@ -1,4 +1,4 @@
-#pygn
+# pygn
 
 pygn (pronounced "pigeon") is a simple Python client for the <a href="http://www.gracenote.com">Gracenote</a> Music API, which can retrieve Artist, Album and Track metadata with the most common options.
 
@@ -11,11 +11,11 @@ pygn allows you to look up artists, albums, and tracks in the Gracenote database
 * Trigger events in the radio playlist as track played , track skipped, track_like/dislike
  
 
-##Installation
+## Installation
 
 Since pygn is (so far) contained in a single Python file, no installer is provided. Simply copy pygn.py to your working directory, or to your Python site-packages/dist-packages directory, and call 'import pygn'!
 
-##Getting Started
+## Getting Started
 
 You will need a Gracenote Client ID to use this module. Please visit https://developer.gracenote.com to get yours.
 
